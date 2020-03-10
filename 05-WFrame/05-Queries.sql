@@ -27,7 +27,9 @@ Lets take a look at the example:
 		  7 |     4402.04 | 11263.53 |
 		  1 |     3876.76 | 15140.29 |
 '
-In the above query, we sum the column total_price. For each row, we add the current row AND all the previously introduced rows (UNBOUNDED PRECEDING) to the sum. As a result, the sum will increase with each new order. This is similar to finding the cumulative sum.
+In the above query, we sum the column total_price. For each row, we add the current row AND all the previously introduced rows 
+(UNBOUNDED PRECEDING) to the sum. As a result, the sum will increase with each new order. 
+This is similar to finding the cumulative sum.
 '
 
 '
@@ -228,11 +230,15 @@ The window frame of RANGE is defined just like the window frame of ROWS: use BET
 We can use UNBOUNDED PRECEDING and UNBOUNDED FOLLOWING, as well as CURRENT ROW, but we cannot use "n PRECEDING" 
 and "n FOLLOWING" with RANGE.
 
-Why? With ROWS, we always knew that there was a single current row, and so we could easily calculate the previous/next rows. With RANGE, the database must understand what "three preceding values" means. It is easy to understand "three preceding days" but what are "three numbers preceding 14.5"? The SQL standard defined the meaning of n PRECEDING and n FOLLOWING for RANGE, but the database usually do not implement it.
+Why? With ROWS, we always knew that there was a single current row, and so we could easily calculate the previous/next rows. 
+With RANGE, the database must understand what "three preceding values" means. It is easy to understand "three preceding days" 
+but what are "three numbers preceding 14.5"? The SQL standard defined the meaning of n PRECEDING and n FOLLOWING for RANGE, 
+but the database usually does not implement it.
 '
 
 
--- For each stock_change with product_id = 7, show its id, quantity, changed date and another column which will count the number of stock changes with product_id = 7 on that particular date.
+-- For each stock_change with product_id = 7, show its id, quantity, changed date and another column which 
+-- will count the number of stock changes with product_id = 7 on that particular date.
 SELECT id, quantity, changed,
 	COUNT(*) OVER(ORDER BY changed RANGE CURRENT ROW)
 FROM stock_change
@@ -317,10 +323,10 @@ This may differ between databases, but the most typical rule is as follows:
 '
 It is time to review what we have learned in this part:
 
-	* You can define a window frame within OVER(...). The syntax is: [ROWS|RANGE] <window frame definition>.
-	* ROWS always treats rows individually (like the ROW_NUMBER() function), RANGE also adds rows which share the same value in the column we order by (like the RANK() function).
-	* <window frame definition> is defined with BETWEEN <lower bound> AND <upper bound>, where the bounds may be defined with:
-		UNBOUNDED PRECEDING, n PRECEDING (ROWS only), CURRENT ROW, n FOLLOWING (ROWS only), UNBOUNDED FOLLOWING
+* You can define a window frame within OVER(...). The syntax is: [ROWS|RANGE] <window frame definition>.
+* ROWS always treats rows individually (like the ROW_NUMBER() function), RANGE also adds rows which share the same value in the column we order by (like the RANK() function).
+* <window frame definition> is defined with BETWEEN <lower bound> AND <upper bound>, where the bounds may be defined with:
+UNBOUNDED PRECEDING, n PRECEDING (ROWS only), CURRENT ROW, n FOLLOWING (ROWS only), UNBOUNDED FOLLOWING
 '
 
 
