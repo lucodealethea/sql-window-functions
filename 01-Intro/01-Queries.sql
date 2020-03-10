@@ -4,17 +4,18 @@ from dog d, person p
 where d.owner_id = p.id
 group by p.id
 
-			-- For each owner, show their id AS dog_owner_id and the number of dogs they have (Same question with Window Functions).
-			select distinct(p.id) as dog_owner_id, 
-				count(*) over(partition by d.owner_id)  
-			from person p, dog d 
-			where p.id = d.owner_id;
+-- For each owner, show their id AS dog_owner_id and the number of dogs they have (Same question with Window Functions).
+select distinct(p.id) as dog_owner_id, 
+count(*) over(partition by d.owner_id)  
+from person p, dog d 
+where p.id = d.owner_id;
 
 '
 These functions are called window functions precisely because the set of rows is called a window or a window frame. The syntax is:
 <window_function> OVER (...)
 
-<window_function> can be an aggregate function that we already know (COUNT(), SUM(), AVG() etc.), or another function, such as a ranking or an analytical function that we will get to know in this course.
+<window_function> can be an aggregate function that we already know (COUNT(), SUM(), AVG() etc.), or another function, 
+such as a ranking or an analytical function that we will get to know in this course.
 '
 
 
@@ -34,7 +35,9 @@ ORDER BY - the results are sorted,
 OFFSET - the first rows are skipped,
 LIMIT/FETCH/TOP - only the first rows are selected
 
-Practically, this order means that we cant put window functions anywhere in the FROM, WHERE, GROUP BY or HAVING clauses. This is because at the time of calculating these elements, window functions are not yet calculated - and it is impossible to use something which is not already available.
+Practically, this order means that we cant put window functions anywhere in the FROM, WHERE, GROUP BY or HAVING clauses. 
+This is because at the time of calculating these elements, window functions are not yet calculated -
+and it is impossible to use something which is not already available.
 '
 
 
