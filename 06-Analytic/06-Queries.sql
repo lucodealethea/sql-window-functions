@@ -2,7 +2,9 @@
 Lets introduce the general syntax for analytic functions:
 <analytic function> OVER (...)
 
-Analytic functions are quite easy, their syntax is identical to aggregate functions. The difference is that aggregate functions calculate a cumulative result for all the rows in the window frame, while the analytic functions refer to single rows within the frame.
+Analytic functions are quite easy, their syntax is identical to aggregate functions. 
+The difference is that aggregate functions calculate a cumulative result for all the rows in the window frame, 
+while the analytic functions refer to single rows within the frame.
 '
 
 '
@@ -18,7 +20,9 @@ FROM website;
  All About Health | 2016-03-15 | Around The World |
  Around The World | 2016-05-01 | null             |
 '
-The analytic function here is LEAD(name). LEAD with a single argument in the parentheses looks at the next row in the given order and shows the value in the column specified as the argument.
+The analytic function here is LEAD(name). 
+LEAD with a single argument in the parentheses looks at the next row in the given order and shows the value in the column 
+specified as the argument.
 '
 
 --For all the statistics of the website with id = 1, show the day, the number of users and the number of users on the next day.
@@ -40,7 +44,8 @@ WHERE website_id = 1
  
  
 '
-LEAD can be extremely useful when we want to calculate deltas, i.e. differences between two values. A typical example may look like this:
+LEAD can be extremely useful when we want to calculate deltas, i.e. differences between two values. 
+A typical example may look like this:
 '
 SELECT day, clicks,
 	LEAD(clicks) OVER(ORDER BY day),
@@ -57,20 +62,26 @@ WHERE website_id = 2;
  2016-05-05 |    128 |   83 |       45 |
  2016-05-06 |     83 |  202 |     -119 |
 '
-The above query calculates day-to-day deltas: the last column shows the difference in clicks between the current day and the next day. From a business point of view, this could easily tell us a lot about the website: if the deltas for many rows are positive, and possibly increasing, then the website is expanding. If, in turn, the deltas are mostly negative, we can start to worry about the performance of the website.
+The above query calculates day-to-day deltas: the last column shows the difference in clicks between the current day and the next day. 
+From a business point of view, this could easily tell us a lot about the website: if the deltas for many rows are positive, 
+and possibly increasing, then the website is expanding. If, in turn, the deltas are mostly negative, we can start to worry 
+about the performance of the website.
 '
 
 '
-There is also another version of LEAD. It takes two arguments: LEAD(x,y). x remains the same – it specifies the column to return. y, in turn, is a number which defines the number of rows forward from the current value. For instance:
+There is also another version of LEAD. It takes two arguments: LEAD(x,y). x remains the same – it specifies the column to return. y, 
+in turn, is a number which defines the number of rows forward from the current value. For instance:
 '
 SELECT name, opened,
 	LEAD(opened,2) OVER(ORDER BY opened)
 FROM website;
 '
-This form of LEAD wont show the webpage with the opening date coming immediately after the current opening date. Instead, it will show the opening date 2 rows forward – the 1st row will show the 3rd date etc
+This form of LEAD wont show the webpage with the opening date coming immediately after the current opening date. 
+Instead, it will show the opening date 2 rows forward – the 1st row will show the 3rd date etc
 '
 
--- Take the statistics for the website with id = 2 between 1 and 14 May 2016 and show the day, the number of users and the number of users 7 days later.
+-- Take the statistics for the website with id = 2 between 1 and 14 May 2016 and show the day, the number of users 
+-- and the number of users 7 days later.
 SELECT day, users,
 	LEAD(users,7) OVER(ORDER BY day)
 FROM statistics
@@ -93,7 +104,11 @@ SELECT name, opened,
 	LEAD(opened,2,'2000-01-01') OVER(ORDER BY opened)
 FROM website;
 '
-The new (last) argument tells the function what it should return if no matching value is found. Previously, the last rows got NULLs from the function, because there were no "lead" (further) rows for them. Now, we can specify what should be displayed in such cases instead of the default NULL. Here, we show '2000-01-01'. Note that this value must be of the same type as the column itself: if we show dates with LEAD, the last argument must be a date too. We cannot show "not available" or 0 instead.
+The new (last) argument tells the function what it should return if no matching value is found. 
+Previously, the last rows got NULLs from the function, because there were no "lead" (further) rows for them. 
+Now, we can specify what should be displayed in such cases instead of the default NULL. Here, we show '2000-01-01'. 
+Note that this value must be of the same type as the column itself: if we show dates with LEAD, the last argument must be a date too. 
+We cannot show "not available" or 0 instead.
 '
 
 '
@@ -105,7 +120,8 @@ FROM website;
 '
 Here, instead of showing the next opening date, we show the previous opening date. 
 
-Note that we can always sort the rows in the reverse order with DESC and use LEAD(...) instead of LAG(...), or the other way around. In other words:
+Note that we can always sort the rows in the reverse order with DESC and use LEAD(...) instead of LAG(...), or the other way around. 
+In other words:
 
 LEAD (...) OVER(ORDER BY...) is the same as LAG (...) OVER (ORDER BY ... DESC)
 and
@@ -116,7 +132,8 @@ And, of course, there is also an analogous version of LAG(x,y) and LAG(x,y,z).
 
 
 '
-LEAD and LAG are 2 functions which are always relative to the current row. Now, we will get to know three other functions that are independent of the current row.
+LEAD and LAG are 2 functions which are always relative to the current row. Now, we will get to know three other functions 
+that are independent of the current row.
 
 The first one is FIRST_VALUE(x). This returns the first value in the column x in the given order. Take a look:
 '
@@ -130,9 +147,11 @@ FROM website;
  All About Health | 2016-03-15 |    700 |        3000 |
  Around The World | 2016-05-01 |    500 |        3000 |
 '
-Here, we still sort rows by the opening date (ORDER BY opened), but we show the lowest budget instead of the first opening date (FIRST_VALUE(budget)). In this way, we can show the budget for the website that was opened first.
+Here, we still sort rows by the opening date (ORDER BY opened), but we show the lowest budget instead of the first opening date 
+(FIRST_VALUE(budget)). In this way, we can show the budget for the website that was opened first.
 
-Note that this would be impossible to achieve with a simple MIN(...) function. MIN(budget) would simply show the smallest budget: 500 in this case. That is not the same as the budget of the first website (3000).
+Note that this would be impossible to achieve with a simple MIN(...) function. MIN(budget) would simply show the smallest budget: 
+500 in this case. That is not the same as the budget of the first website (3000).
 '
 
 -- Show the statistics for website_id = 2. For each row, show the day, the number of users and the smallest number of users ever.
@@ -172,7 +191,8 @@ WHERE website_id = 3
  
  
 '
-Of course, we can also find the last value: simply use LAST_VALUE(x) instead. But LAST_VALUE shows the current value instead of the highest value.
+Of course, we can also find the last value: simply use LAST_VALUE(x) instead. But LAST_VALUE shows the current value instead 
+of the highest value.
 '
 SELECT name, opened,
 	LAST_VALUE(opened) OVER(ORDER BY opened)
@@ -184,9 +204,14 @@ FROM website;
  All About Health | 2016-03-15 | 2016-03-15 |
  Around The World | 2016-05-01 | 2016-05-01 |
 '
-The query didnt work! Instead of the latest opening date, we saw the current opening date. In order to understand why this happened, we need to refer to the previous part of our course, where we talked about default window frames:
+The query didnt work! Instead of the latest opening date, we saw the current opening date. 
+In order to understand why this happened, we need to refer to the previous part of our course, where we talked 
+about default window frames:
 
-If there is an ORDER BY clause, RANGE UNBOUNDED PRECEDING will be used as the default window frame. And this is precisely the cause of our troubles. We indeed used ORDER BY within OVER(...), which is why LAST_VALUE(x) only considers the rows from the first row until the current row. The solution is quite simple: we need to define the right window frame:
+If there is an ORDER BY clause, RANGE UNBOUNDED PRECEDING will be used as the default window frame. 
+And this is precisely the cause of our troubles. We indeed used ORDER BY within OVER(...), 
+which is why LAST_VALUE(x) only considers the rows from the first row until the current row. 
+The solution is quite simple: we need to define the right window frame:
 '
 SELECT name, opened,
 	LAST_VALUE(opened) OVER(ORDER BY opened ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
@@ -199,7 +224,8 @@ FROM website;
  Around The World | 2016-05-01 | 2016-05-01 |
 
  
--- Show the statistics for website_id = 1. For each row, show the day, the number of impressions and the number of impressions on the day with the most users.
+-- Show the statistics for website_id = 1. For each row, show the day, the number of impressions and the number of impressions 
+-- on the day with the most users.
 SELECT day, impressions,
 	LAST_VALUE(impressions) OVER(ORDER BY users ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 FROM statistics
@@ -215,18 +241,22 @@ WHERE website_id = 1
 
 
 '
-The last function we will learn in this part is: NTH_VALUE(x,n). This function returns the value in the column x of the nth row in the given order.
+The last function we will learn in this part is: NTH_VALUE(x,n). 
+This function returns the value in the column x of the nth row in the given order.
 '
 SELECT name, opened,
 	NTH_VALUE(opened,2) OVER(ORDER BY opened ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 FROM website;
 '
-This time, we are showing the opening date of the current row together with the second row when sorted by the opening date. With NTH_VALUE, we also need to redefine the window frame. Otherwise, some rows will display incorrect values. We can always revert the order by adding the word DESC, which sometimes comes in handy with NTH_VALUE:
+This time, we are showing the opening date of the current row together with the second row when sorted by the opening date. 
+With NTH_VALUE, we also need to redefine the window frame. Otherwise, some rows will display incorrect values. 
+We can always revert the order by adding the word DESC, which sometimes comes in handy with NTH_VALUE:
 
 ...OVER(ORDER BY opened DESC)...
 ' 
  
--- Take the statistics for the website with id = 2 between May 15 and May 31, 2016. Show the day, the revenue on that day and the third highest revenue in that period.
+-- Take the statistics for the website with id = 2 between May 15 and May 31, 2016. 
+-- Show the day, the revenue on that day and the third highest revenue in that period.
 SELECT day, revenue,
 	NTH_VALUE(revenue, 3) OVER(ORDER BY revenue desc ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 FROM statistics
@@ -243,7 +273,8 @@ WHERE website_id = 2  and day BETWEEN '2016-05-15' AND '2016-05-31';
  2016-05-19 |   40.46 |     54.38 |
  
  
--- Take the day May 14, 2016 and for each row, show: website_id, revenue on that day, the highest revenue from any website on that day (AS highest_revenue and the lowest revenue from any website on that day (as lowest_revenue).
+-- Take the day May 14, 2016 and for each row, show: website_id, revenue on that day, the highest revenue from any website 
+-- on that day (AS highest_revenue and the lowest revenue from any website on that day (as lowest_revenue).
 SELECT website_id, revenue,
 	FIRST_VALUE(revenue) OVER(order by revenue DESC) AS highest_revenue,
 	LAST_VALUE(revenue) OVER(ORDER BY revenue DESC ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as lowest_revenue
