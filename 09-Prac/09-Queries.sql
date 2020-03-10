@@ -1,4 +1,5 @@
---For each distinctive movie, show the title, the average customer rating for that movie, the average customer rating for the entire genre and the average customer rating for all movies.
+--For each distinctive movie, show the title, the average customer rating for that movie, the average customer rating 
+-- for the entire genre and the average customer rating for all movies.
 with subquery as(
 	select m.title, 
 		avg(r.rating) over() as avg1,
@@ -18,7 +19,8 @@ select title, avg(avg1), avg(avg2), avg(avg3) from subquery group by title
  Titanic                 | 5.7222222222222222 | 9.2500000000000000 | 8.6250000000000000 |
  
  
---For each customer, show the following information: first_name, last_name, the average payment_amount from single rentals by that customer and the average payment_amount from single rentals by any customer from the same country.
+--For each customer, show the following information: first_name, last_name, the average payment_amount 
+-- from single rentals by that customer and the average payment_amount from single rentals by any customer from the same country.
 select c.first_name, c.last_name,
 	avg(s.payment_amount) over(partition by c.id),
     avg(s.payment_amount) over(partition by c.country)
@@ -36,7 +38,8 @@ where c.id = s.customer_id
  Jeffrey    | Washington | 20.8571428571428571 | 18.90000
  
  
---Show the first and last name of the customer who bought the second most recent giftcard along with the date when the payment took place. Assume that an individual rank is assigned for each giftcard purchase.
+--Show the first and last name of the customer who bought the second most recent giftcard along with the date 
+-- when the payment took place. Assume that an individual rank is assigned for each giftcard purchase.
 with ranking as(
     select c.first_name, c.last_name, g.payment_date,
         row_number() over(order by g.payment_date desc) as rank
@@ -50,7 +53,10 @@ select first_name, last_name, payment_date from ranking where rank=2
  Eric       | Rivera    | 2016-04-07   |
  
 
---For each single rental, show the rental_date, the title of the movie rented, its genre, the payment_amount and the rank of the rental in terms of the price paid (the most expensive rental should have rank = 1). The ranking should be created separately for each movie genre. Allow the same rank for multiple rows and allow gaps in numbering too.
+--For each single rental, show the rental_date, the title of the movie rented, its genre, the payment_amount and 
+-- the rank of the rental in terms of the price paid (the most expensive rental should have rank = 1). 
+-- The ranking should be created separately for each movie genre. Allow the same rank for multiple rows and allow gaps in numbering too.
+
 select s.rental_date, m.title, m.genre, s.payment_amount,
 	rank() over(partition by m.genre order by s.payment_amount desc)
 from single_rental s, movie m
@@ -81,7 +87,9 @@ FROM single_rental
  15 | 2016-02-20  |             28 | 130 |
  
  
--- For each subscription, show the following columns: id, length, platform, payment_date, payment_amount and the future cashflows calculated as the total money from all subscriptions starting from the beginning of the payment_date of the current row (i.e. include any other payments on the very same date) until the very end.
+-- For each subscription, show the following columns: id, length, platform, payment_date, payment_amount 
+-- and the future cashflows calculated as the total money from all subscriptions starting from the beginning of the payment_date 
+-- of the current row (i.e. include any other payments on the very same date) until the very end.
 SELECT id, length, platform, payment_date, payment_amount,
   	SUM(payment_amount) OVER(ORDER BY payment_date RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
 FROM subscription
@@ -100,7 +108,9 @@ FROM subscription
   5 |     30 | mobile   | 2016-08-31   |            240 |  240 |  
   
   
--- For each single rental, show the following information: rental_date, title of the movie rented, genre of the movie, payment_amount and the highest payment_amount for any movie in the same genre rented from the first day up to the current rental_date.
+-- For each single rental, show the following information: rental_date, title of the movie rented, 
+-- genre of the movie, payment_amount and the highest payment_amount for any movie in the same genre rented from the 
+-- first day up to the current rental_date.
 SELECT rental_date, title, genre, payment_amount,
   	MAX(payment_amount) OVER(PARTITION BY genre ORDER BY rental_date ROWS UNBOUNDED PRECEDING)
 FROM single_rental s, movie m
@@ -117,7 +127,8 @@ WHERE s.movie_id = m.id
  2016-02-20  | Titanic                 | drama       |             28 |  28 |
  
  
---For each giftcard, show its amount_worth, payment_amount and two more columns: the payment_amount of the first and last giftcards purchased in terms of the payment_date.
+--For each giftcard, show its amount_worth, payment_amount and two more columns: the payment_amount of the first and 
+-- last giftcards purchased in terms of the payment_date.
 SELECT amount_worth, payment_amount,
   	FIRST_VALUE(payment_amount) OVER(ORDER BY payment_date),
     LAST_VALUE(payment_amount) OVER(ORDER BY payment_date ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
@@ -134,7 +145,8 @@ FROM giftcard;
            30 |             15 |          99 |         78 |
 		   
 		   
--- For each rental date, show the rental_date, the sum of payment amounts (column name payment_amounts) from single_rentals on that day, the sum of payment_amounts on the previous day and the difference between these two values.
+-- For each rental date, show the rental_date, the sum of payment amounts (column name payment_amounts) 
+-- from single_rentals on that day, the sum of payment_amounts on the previous day and the difference between these two values.
 WITH subquery AS(
     SELECT rental_date, SUM(payment_amount) AS payment_amounts
     FROM single_rental
@@ -155,7 +167,9 @@ FROM subquery
  2016-03-08  |              24 |  28 |         -4 |
  
  
--- For each customer, show the following information: first_name, last_name, the sum of payments (AS sum_of_payments) for all single rentals and the sum of payments of the median customer in terms of the sum of payments (since there are 7 customers, pick the 4th customer as the median).
+-- For each customer, show the following information: first_name, last_name, the sum of payments (AS sum_of_payments) 
+-- for all single rentals and the sum of payments of the median customer in terms of the sum of payments 
+--(since there are 7 customers, pick the 4th customer as the median).
 WITH subquery AS(
     SELECT first_name, last_name, SUM(payment_amount) AS sum_of_payments
     FROM single_rental s, customer c
@@ -192,7 +206,8 @@ FROM movie;
  Plan 9 From Outer Space | fantasy     |             2 |    2 |
  
  
--- For each review, show the following information: its id, title of the movie, the rating and the previous rating given by any customer to the same movie when sorted by the id of the reviews.
+-- For each review, show the following information: its id, title of the movie, the rating and the previous rating given 
+-- by any customer to the same movie when sorted by the id of the reviews.
 SELECT r.id, m.title, r.rating,
   	LAG(r.rating) OVER(PARTITION BY m.id ORDER BY r.id)
 FROM review r, movie m
@@ -209,7 +224,8 @@ WHERE r.movie_id = m.id;
   7 | Godfather               |      9 |null |
   
   
--- For each movie, show the following information: title, genre, average user rating for that movie and its rank in the respective genre based on that average rating in descending order (so that the best movies will be shown first).
+-- For each movie, show the following information: title, genre, average user rating for that movie and its rank 
+-- in the respective genre based on that average rating in descending order (so that the best movies will be shown first).
 WITH subquery AS(
     SELECT m.title, m.genre, AVG(r.rating)	
     FROM review r, movie m
@@ -229,7 +245,8 @@ FROM subquery
  Plan 9 From Outer Space | fantasy     | 1.7500000000000000 |    2 |
  
  
--- For each platform, show the following columns: platform, sum of subscription payments for that platform and its rank based on that sum (the platform with the highest sum should get the rank of 1).
+-- For each platform, show the following columns: platform, sum of subscription payments for that platform 
+-- and its rank based on that sum (the platform with the highest sum should get the rank of 1).
 WITH ranking AS(
 	SELECT platform, SUM(payment_amount)
 	FROM subscription
@@ -256,7 +273,8 @@ SELECT platform, sum, RANK() OVER(ORDER BY sum DESC) FROM ranking
 			 tablet   | 1470 |    3 |
  
  
--- Divide subscriptions into three groups (buckets) based on the payment_amount. Group the rows based on those buckets. Show the following columns: bucket, minimal payment_amount in that bucket and maximal payment_amount in that bucket.
+-- Divide subscriptions into three groups (buckets) based on the payment_amount. Group the rows based on those buckets. 
+-- Show the following columns: bucket, minimal payment_amount in that bucket and maximal payment_amount in that bucket.
 SELECT bucket, MIN(payment_amount), MAX(payment_amount)
 FROM
 	(SELECT payment_amount,
